@@ -1,0 +1,95 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ structure.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>组织架构信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="title" type="text" value="{{ structure.title }}"/>
+                </div>
+                <label class="col-sm-2 control-label">类别</label>
+                <div class="col-sm-3">
+                  <select class="form-control" name="type">
+                    <option value={{ structure.type }}> {{ structure.get_type_display|default:"--类别--" }} </option>
+                    <option value="firm">公司</option>
+                    <option value="department">部门</option>
+                  </select>
+                </div>
+
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">所属</label>
+                <div class="col-sm-3">
+                  <select class="form-control" name="parent">
+                    <option value={{ structure.parent_id|default_if_none:"" }}> {{ structure.parent.title|default:"" }} </option>
+                    <option></option>
+                    {% for s in structures %}
+                    <option value={{ s.id }}> {{ s.title}} </option>
+                    {% endfor %}
+                  </select>
+                </div>
+            </div>
+          </fieldset>
+
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'system-basic:structure-detail' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.result){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else{
+					layer.alert('数据保存失败', {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+        <input type="hidden" name='work_order' value="{{ work_order.id }}" />
+        <input type="hidden" name='number' value="{{ work_order.number }}" />
+        <input type="hidden" name='name' value="{{ request.user.id }}" />
+        <input type="hidden" name='record_type' value="{{ record_type }}" />
+        <div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>工单确认</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">确认记录</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="content" rows="5" ></textarea>
+                </div>
+            </div>
+
+          </fieldset>
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'personal-workorder-finish' %}",
+			data : data,
+			cache: false,
+            beforeSend:function(){
+			    this.layerIndex = layer.load(1, {
+                    shade: [0.1,'#fff'] //0.1透明度的白色背景
+                });
+            },
+			success : function(msg) {
+			    layer.closeAll('loading');
+				if (msg.status == 'success'){
+					layer.alert('执行确认完毕！邮件发送异常', {icon: 0},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert('请将信息填写完整！', {icon: 5});
+				}else if (msg.status == 'success_send'){
+					layer.alert('执行确认完毕，通知邮件发送成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'ban'){
+					layer.alert(' 当前状禁止执行', {icon: 4},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}
+				return ;
+			}
+		});
+	});
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+
+/*input 时间输入选择*/
+</script>
+
+{% endblock %}

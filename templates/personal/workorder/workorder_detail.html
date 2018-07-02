@@ -1,0 +1,502 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="">工单管理</a></li>
+    <li class="active"><a href="#">工单详情</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+
+  <section class="content">
+     {% if ban %}
+      <div class="col-md-6">
+          <div class="box box-default">
+            <div class="box-header with-border">
+              <i class="fa fa-warning"></i>
+
+              <h3 class="box-title">警告</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-ban"></i> 非法访问!</h4>
+                你正在通过手动指定ID来获取非授权数据，系统已记录你的非法访问行为
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+     {% endif %}
+      <div class="row" {% if ban %}hidden{% endif %}>
+        <div class="col-md-3">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">客户信息</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+              <ul class="nav nav-pills nav-stacked">
+                  <li><a href="#" title="联系人"><i class="fa fa-user"></i>  {{ work_order.customer.name }}</a></li>
+                <li><a href="#" title="电话"><i class="fa fa-phone"></i> {{ work_order.customer.phone }}</a></li>
+                <li><a href="#" title="单位"><i class="fa fa-building" ></i> {{ work_order.customer.unit }}</a></li>
+                <li><a href="#" title="地址"><i class="fa fa-map-marker"></i> {{ work_order.customer.address }}</a></li>
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /. box -->
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">申请人信息</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+              <ul class="nav nav-pills nav-stacked">
+                  <li><a href="#" title="联系人"><i class="fa fa-user"></i>{{ work_order.proposer.name }}</a></li>
+                <li><a href="#" title="电话"><i class="fa fa-phone"></i>{{ work_order.proposer.mobile }}</a></li>
+                <li><a href="#" title="邮箱"><i class="fa fa-envelope" ></i>{{ work_order.proposer.email }}</a></li>
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+            {% if work_order.receiver %}
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">接单人信息</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+              <ul class="nav nav-pills nav-stacked">
+                  <li><a href="#" title="联系人"><i class="fa fa-user"></i>{{ work_order.receiver.name }}</a></li>
+                <li><a href="#" title="电话"><i class="fa fa-phone"></i>{{ work_order.receiver.mobile }}</a></li>
+                <li><a href="#" title="邮箱"><i class="fa fa-envelope" ></i>{{ work_order.receiver.email }}</a></li>
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+            {% endif %}
+        </div>
+        <!-- /.col -->
+       <div class="col-md-9">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">工单详情</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+         <div class="box-body no-padding">
+           <div class="mailbox-controls margin-b-10">
+            <div class="btn-group margin-l-5">
+              <button type="button" class="btn btn-danger btn-sm" title="退回工单" id="btnWorkListReturn"
+                      onclick="doWorkOrderReturn({{ work_order.id }})">
+                  <i class="fa fa-undo"> 退回</i>
+              </button>
+              <button type="button" class="btn btn-info btn-sm" title="编辑工单" id="btnWorkListEdit"
+                      onclick="doWorkorderUpdate({{ work_order.id }})">
+                  <i class="fa fa-pencil"> 编辑</i>
+              </button>
+              <button type="button" class="btn btn-success btn-sm" title="派发工单" id="btnWorkListSend"
+                      onclick="doWorkorderSend({{ work_order.id }})">
+                  <i class="fa fa-send-o"> 派发</i>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" title="执行反馈" id="btnWorkListExecute"
+                    onclick="doWorkorderExecute({{ work_order.id }})">
+                  <i class="glyphicon glyphicon-play"> 执行</i>
+              </button>
+              <button type="button" class="btn btn-default btn-sm" title="执行确认" id="btnWorkListFinish"
+                      onclick="doWorkorderFinish({{ work_order.id }})">
+                  <i class="fa fa-check"> 确认</i>
+              </button>
+
+            </div>
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-default btn-sm" onclick="doWorkorderProjectUpload({{ work_order.id }})">
+                  <i class="fa fa-cloud-upload">上传项目资料</i>
+                </button>
+                <button type="button" class="btn btn-default btn-sm" onclick="doWorkorderUpload({{ work_order.id }})">
+                  <i class="fa fa-cloud-upload">上传配置资料</i>
+                </button>
+            </div>
+           </div>
+
+           <form class="form-horizontal" id="WorkListDetailsForm" action="" method="post">
+                {% csrf_token %}
+                <div class="table-responsive mailbox-messages">
+                  <table class="table" id="tbWorkList"  style="white-space: nowrap;">
+                    <tbody>
+                        <tr class="warning">
+                            <td><strong> 工单号</strong></td>
+                            <td>{{ work_order.number }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><strong> 标题</strong></td>
+                            <td>{{ work_order.title }}</td>
+
+                        </tr>
+                        <tr class="warning">
+                            <td><strong> 工单类型</strong></td>
+                            <td>{{ work_order.get_type_display }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><strong> 工单状态</strong></td>
+                            <td>{{ work_order.get_status_display }}</td>
+
+                        </tr>
+                        <tr class="warning">
+                            <td><strong> 申请时间</strong></td>
+                            <td>{{ work_order.add_time }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><strong> 安排时间</strong></td>
+                            <td>{{ work_order.do_time }}</td>
+
+                        </tr>
+                        <tr class="warning">
+                            <td><strong> 审批人:</strong></td>
+                            <td>{{ work_order.approver.name }}</td>
+
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="box-footer ">
+
+                </div>
+              </form>
+            </div>
+            <!-- /.box-body -->
+          </div>
+      <!-- /. end worklist_details box -->
+           <div class="box">
+            <div class="box-header with-border">
+              <i class="fa fa-commenting"></i>
+              <h3 class="box-title">执行记录</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <ul class="products-list product-list-in-box">
+                <!-- /.item -->
+                <li class="item">
+                  <div class="product-img">
+                    <img src="/media/{{ work_order.proposer.image }}" alt="Product Image">
+                  </div>
+                  <div class="product-info">
+                    <a href="javascript:void(0)" class="product-title">
+                        {{ work_order.proposer.name }}
+                    </a>
+                    <span class="text-orange"><small>创建</small></span>
+                    <small>{{ work_order.add_time }}</small>
+                    <p class="text-muted margin-top-5">{{ work_order.content }}</p>
+                     <a href="/media/{{ work_order.file_content }}"><small class="pull-right">{{ work_order.file_content | cut:'file' }}</small></a>
+                  </div>
+                </li>
+                 {% for record in work_order_record %}
+                <li class="item">
+                  <div class="product-img">
+                    <img src="/media/{{ record.name.image}}" alt="Product Image">
+                  </div>
+                  <div class="product-info">
+                    <a href="javascript:void(0)" class="product-title">
+                        {{ record.name.name }}
+                    </a>
+                    <span class="text-orange"><small>{{ record.get_record_type_display }}</small></span>
+                    <small>{{ record.add_time }}</small>
+                    <p class="text-muted margin-top-5">{{ record.content }}</p>
+                    <a href="/media/{{ record.file_content }}"><small class="pull-right">{{ record.file_content | cut:'file' }}</small></a>
+                  </div>
+                </li>
+                 {% endfor %}
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+        <div class="box">
+          <div class="box-header with-border">
+          <i class="ion ion-clipboard"></i>
+          <h3 class="box-title">设备列表</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div>
+          <div class="box-body">
+            <table id="dtbList" class="display" cellspacing="0" width="100%">
+                <thead>
+                <tr valign="middle">
+                    <th>ID</th>
+                    <th>设备编号</th>
+                    <th>类型</th>
+                    <th>型号</th>
+                    <th>购买日期</th>
+                    <th>质保日期</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="box-footer clearfix no-border">
+
+      </div>
+      <!-- /. end message box -->
+    </div>
+      <!-- /. message box -->
+        <!-- /.col -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+  <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+  <script type="text/javascript">
+	$(function() {
+	    $('#PERSONAL-WORKORDER').addClass('active');
+	    $('#{{ menu.code }}').addClass('active');
+
+	});
+
+    var oDataTable=null;
+    $(function() {
+        oDataTable = initTable();
+        function initTable() {
+            var oTable=$('#dtbList').DataTable($.extend(true,{},
+                            DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                            {
+                                ajax : {
+                                    "url":"{% url 'adm-equipment:list' %}",
+                                    "data":function ( d ) {
+                                        d.customer="{{ work_order.customer_id }}";
+                                    }
+                            },
+                            columns : [
+                                    {
+                                        data : "id",
+                                        width : "5%",
+                                    },
+                                    {
+                                        data : "number",
+                                        width : "10%",
+                                    },
+
+
+                                    {
+                                        data : "equipment_type__name",
+                                    },
+                                    {
+                                        data : "equipment_model",
+                                    },
+                                    {
+                                        data : "buy_date",
+                                    },
+                                    {
+                                        data : "warranty_date",
+                                    },
+
+                                    {
+                                        data : "id",
+                                        {#width : "10%",#}
+                                        bSortable : "false",
+                                        render : function(data, type, row, meta) {
+                                            var ret="<button title='编辑' onclick='doEquipmentUpdate("
+                                            + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
+                                            return ret;
+                                        }
+                                    } ],
+                            }));
+            return oTable;
+        }
+
+
+        $("#btnCreate").click(function() {
+            var div=layer.open({
+                type : 2,
+                title : '新增',
+                shadeClose : false,
+                maxmin : true,
+                area : [ '800px', '600px' ],
+                content : "{% url 'adm-equipment:create' %}",
+                end : function() {
+                    //关闭时做的事情
+                    oDataTable.ajax.reload();
+                }
+            });
+               layer.full(div)
+        });
+
+
+    });
+
+    function doEquipmentUpdate(id){
+	var div=layer.open({
+		type : 2,
+		title : '编辑-详情',
+		shadeClose : false,
+    	maxmin : true,
+		area : [ '800px', '500px' ],
+		content : [ "{% url 'adm-equipment:create' %}"+'?id='+id, 'no' ],
+		end : function() {
+			//oDataTable.ajax.reload();
+            window.location.reload();
+
+		}
+	});
+    layer.full(div)
+}
+
+function doWorkorderUpdate(id){
+	var div=layer.open({
+		type : 2,
+		title : '编辑-详情',
+		shadeClose : false,
+    	maxmin : true,
+		area : [ '800px', '500px' ],
+		content : [ "{% url 'personal-workorder-update' %}"+'?id='+id],
+		end : function() {
+			//oDataTable.ajax.reload();
+            window.location.reload();
+
+		}
+	});
+    layer.full(div)
+}
+
+function doWorkorderSend(id){
+	    layer.open({
+		type : 2,
+		title : '工单派发',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '500px' ],
+		content : [ "{% url 'personal-workorder-send' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+
+function doWorkorderExecute(id){
+	    layer.open({
+		type : 2,
+		title : '工单执行',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '400px' ],
+		content : [ "{% url 'personal-workorder-execute' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+
+function doWorkorderFinish(id){
+	    layer.open({
+		type : 2,
+		title : '工单确认',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '400px' ],
+		content : [ "{% url 'personal-workorder-finish' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+
+function doWorkOrderReturn(id){
+	    layer.open({
+		type : 2,
+		title : '工单退回',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '300px' ],
+		content : [ "{% url 'personal-workorder-return' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+
+function doWorkorderUpload(id){
+	    layer.open({
+		type : 2,
+		title : '文件上传',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '300px' ],
+		content : [ "{% url 'personal-workorder-upload' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+
+function doWorkorderProjectUpload(id){
+	    layer.open({
+		type : 2,
+		title : '文件上传',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '300px' ],
+		content : [ "{% url 'personal-workorder-project-upload' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+}
+  </script>
+
+{% endblock %}

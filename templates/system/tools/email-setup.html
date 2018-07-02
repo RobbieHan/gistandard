@@ -1,0 +1,129 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="{{ menu.parent.parent.url }}">{{ menu.parent.parent.title }}</a></li>
+    <li class="active"><a href="{{ menu.url }}">{{ menu.title }}</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+  <section class="content">
+
+     <div class="col-md-8">
+          <!-- Horizontal Form -->
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">发件服务器</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+              <div class="box-body">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" >SMTP服务器</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="loginTitle" placeholder="">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" >SMTP端口</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="mainTitle" placeholder="">
+                  </div>
+                </div>
+                <legend>
+                  <h4>系统邮箱帐号</h4>
+                </legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" >邮箱帐号</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="headTitle" placeholder="">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" >邮箱密码</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="copyright" placeholder="">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" >显示名称</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="url" placeholder="">
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+{#              <div class="box-footer ">#}
+{#			    <div class="row span7 text-center ">#}
+{#                  <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>#}
+{#                  <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>#}
+{#			    </div>#}
+{#		      </div>#}
+              <!-- /.box-footer -->
+            </form>
+          </div>
+          <!-- /.box -->
+     </div>
+
+  </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+  <script type="text/javascript">
+	$(function() {
+        $('#SYSTEM-TOOLS').addClass('active');
+		$('#SYSTEM-TOOLS-EMAIL_SETUP').addClass('active');
+	});
+  </script>
+
+  <script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+    		url : "{% url 'system-tools:system_setup' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.result){
+					layer.alert('数据保存成功！', {icon: 1});
+				}else{
+					layer.alert('数据保存失败', {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    });
+
+  </script>
+
+{% endblock %}

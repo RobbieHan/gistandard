@@ -1,0 +1,164 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+        <input type="hidden" name='proposer' value="{{ request.user.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+            <div class="form-group has-feedback">
+               <div class="col-sm-8">创建工单</div>
+            </div>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">工单号</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="number"  readonly="readonly" value="{{ new_number }}{% if work_order %}{{ work_order.number }}{% endif %}" type="text" />
+                </div>
+                <label class="col-sm-2 control-label">标题</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="title" type="text" value="{{ work_order.title }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">工单类型</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="type">
+                  <option value="{{ work_order.type }}">{{ work_order.get_type_display }}</option>
+                  {% for type in type_list  %}
+                  <option value="{{ type.item}}">{{ type.value }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+                <label class="col-sm-2 control-label">工单状态</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="status">
+                  <option value="{{ work_order.status }}">{{ work_order.get_status_display }}</option>
+                  <option value="1">新建-保存</option>
+                  <option value="2">提交-等待审批</option>
+                 </select>
+                 </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">安排时间</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="do_time" value="{{ work_order.do_time |date:'Y-m-d H:m:s'}}"/>
+                </div>
+                <label class="col-sm-2 control-label">客户单位</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="customer">
+                  <option value="{{ work_order.customer_id }}">{{ work_order.customer.unit }}</option>
+                  {% for cus in customer %}
+                  <option value="{{ cus.id}}">{{ cus.unit }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">审批人</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="approver">
+                  <option value="{{ work_order.approver_id }}">{{ work_order.approver.name }}</option>
+                  {% for app in approver %}
+                  <option value="{{ app.id}}">{{ app.name }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">工单内容</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="content" rows="5" >{{ work_order.content }}</textarea>
+                </div>
+            </div>
+
+          </fieldset>
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'personal-workorder-create' %}",
+			data : data,
+			cache: false,
+            beforeSend:function(){
+			    this.layerIndex = layer.load(1, {
+                    shade: [0.1,'#fff'] //0.1透明度的白色背景
+                });
+            },
+			success : function(msg) {
+			    layer.closeAll('loading');
+				if (msg.status == 'success'){
+					layer.alert('工单保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.work_order_form_errors, {icon: 5});
+				}else if (msg.status == 'submit'){
+					layer.alert('工单申请已提交，邮件发送失败！', {icon: 0},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'submit_send'){
+					layer.alert('工单申请已提交,邮件发送成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}
+				return ;
+			}
+		});
+	});
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+/*input 时间输入选择*/
+    $(".form_datetime").datetimepicker({
+            language:  'zh',
+            //weekStart: 1,
+            //todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            //format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+    });
+
+// select2
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+</script>
+
+{% endblock %}

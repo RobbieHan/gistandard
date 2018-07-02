@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+    mysql:
+        image: mysql:5.6
+        volumes:
+           - /sandbox/mysql:/var/lib/mysql
+        expose:
+           - "3306"
+        restart: always
+        environment:
+           - MYSQL_ROOT_PASSWORD=root
+           - MYSQL_DATABASE=gistandard
+           - MYSQL_USER=ddadmin
+           - MYSQL_PASSWORD=1234@abcd.com
+        
+
+
+    web:
+      build: .
+      restart: always
+      volumes:
+          - /sandbox/media:/sandbox/gistandard/media
+          - /sandbox/nginx/nginx.conf:/etc/nginx/nginx.conf
+      command: bash -c "uwsgi config/sandbox.ini && nginx -g 'daemon off;'"
+      ports: 
+          - "80:80"
+      depends_on:
+          - mysql
+         
+   # nginx:
+   #   image : nginx:alpine
+   #   volumes:
+   #     - /sandbox/nginx/nginx.conf:/etc/nginx/nginx.conf
+   #   ports:
+   #     - "80:80"
+   #   depends_on:
+   #     - web        

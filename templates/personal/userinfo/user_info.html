@@ -1,0 +1,261 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/combo-select/combo.select.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+    <li class="active"><a href="{% url 'personal-user_info' %}">个人中心</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+<section class="content">
+  <div class="row">
+     <div class="col-md-3">
+        <div class="box box-primary">
+        <div class="box-body box-profile">
+          <img class="profile-user-img img-responsive img-circle" src="/media/{{ request.user.image }}" alt="User profile picture">
+
+          <h3 class="profile-username text-center">{{ request.user }}-{{ user.post }}</h3>
+
+          <p class="text-muted text-center">{{ user.department }}</p>
+
+          <ul class="list-group list-group-unbordered">
+            <li class="list-group-item">
+              <b>手机：</b> <a>{{ request.user.mobile }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>邮箱：</b> <a>{{ request.user.email }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>生日：</b> <a>{{ request.user.birthday }}</a>
+            </li>
+          </ul>
+				<div class="text-center">
+					<button type="button" id="btnImport"  class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+						修改头像
+					</button>
+                    <button type="button" id="btnChangePWD" onclick="doChangepasswd()" class="btn btn-danger">
+						修改密码
+					</button>
+				</div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+     </div>
+     <div class="col-md-9">
+        <div class="box box-primary">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ user.id }}" />
+		<input type="hidden" name='user' value="save" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>基本信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">姓名</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="name" type="text" value="{{ user.name }}"/>
+                </div>
+                <label class="col-sm-2 control-label">性别</label>
+                <div class="col-sm-3">
+                  <select class="form-control" name="gender">
+                    <option value={{ user.gender }}> {{ user.get_gender_display }} </option>
+                    <option value="male">男</option>
+                    <option value="famale">女</option>
+                  </select>
+                </div>
+
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">生日</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="birthday"
+                           value="{{ user.birthday|date:"Y-m-d" }}"/>
+                </div>
+                <label class="col-sm-2 control-label">用户名</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" name="username" readonly="readonly" value="{{ user.username }}"/>
+                </div>
+            </div>
+            <legend>
+              <h4 clase="">联系信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">手机</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="mobile" readonly="readonly" type="text" value="{{ user.mobile }}"/>
+                </div>
+                <label class="col-sm-2 control-label">邮箱</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="email" type="text" value="{{ user.email }}"/>
+                </div>
+            </div>
+            <legend>
+              <h4>职员信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">入职日期</label>
+                <div class="col-sm-3">
+                    <input type="text" readonly="readonly" class="form-control" name="joined_date"
+                    value="{{ user.joined_date|date:"Y-m-d" }}"/>
+                </div>
+                <label class="col-sm-2 control-label">部门</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="department" type="text" readonly="readonly" value="{{ user.department.title }}"/>
+                </div>
+
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">岗位</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="post" type="text" readonly="readonly" value="{{ user.post }}"/>
+                </div>
+                <label class="col-sm-2 control-label">上级</label>
+                <div class="col-sm-3">
+                    <input class="form-control"  readonly="readonly" name="superior" type="text" value="{{ user.superior.name }}"/>
+                </div>
+            </div>
+          </fieldset>
+
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	  </form>
+  </div>
+     </div>
+ </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">上传图片</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="file-loading">
+          <input id="input-b9" name="image" multiple type="file">
+        </div>
+        <div id="kartik-file-errors"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+<script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+<script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+<script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+<script type="text/javascript">
+	$(function() {
+		$('#PERSONAL-USERINFO').addClass('active');
+
+	});
+  </script>
+<script type="text/javascript">
+//修改用户信息
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'personal-user_info' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if(msg.status =='fail'){
+					layer.alert('数据保存失败', {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+//修改用户密码弹窗
+function doChangepasswd(){
+	layer.open({
+		type : 2,
+		title : '修改密码',
+		shadeClose : false,
+    	maxmin : true,
+		area : [ '800px', '300px' ],
+		content : "{% url 'personal-passwordchange' %}",
+	});
+}
+
+/*input 时间输入选择*/
+    $(".form_datetime").datetimepicker({
+            language:  'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            //weekStart: 1,
+            //todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+    });
+
+/*select 支持输入检索*/
+  $(function() {
+    $('select').comboSelect();
+ });
+
+//上传头像图片
+
+$(document).on('ready', function() {
+    $("#input-b9").fileinput({
+        showPreview: false,
+        showUpload: true,
+        uploadExtraData: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+        language: "zh",
+        elErrorContainer: '#kartik-file-errors',
+        allowedFileExtensions: ["jpg", "png", "gif"],
+        uploadUrl: '{% url "personal-uploadimage" %}',
+        maxImageWidth: 500,
+        maxImageHeight: 500,
+
+    });
+});
+
+</script>
+
+{% endblock %}

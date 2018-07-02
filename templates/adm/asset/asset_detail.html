@@ -1,0 +1,209 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="#">资产管理</a></li>
+    <li class="active"><a href="#">资产详情</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+
+  <section class="content">
+      <div class="row">
+       <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">资产详情</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+                <div class="btn-group pull-right margin-b-10 margin-r-5">
+                <button type="button" class="btn btn-default btn-sm" onclick="doAssetUpload({{ asset.id }})">
+                  <i class="fa fa-cloud-upload">上传资料</i>
+                </button>
+                  <button type="button" class="btn btn-primary btn-sm" title="返回" id="btnReturn">
+                      <i class="fa fa-undo"> 返回</i>
+                  </button>
+                  <button type="button" class="btn btn-info btn-sm" title="编辑" id="doUpdate"
+                          onclick="doUpdate({{ asset.id }})">
+                      <i class="fa fa-pencil"> 编辑</i>
+                  </button>
+                </div>
+           </div>
+
+               <div class="table-responsive mailbox-messages">
+                  <table class="table" id="tbWorkList"  style="white-space: nowrap;">
+                    <tbody>
+                        <tr class="info">
+                            <td width="10%"><strong>资产编号</strong></td>
+                            <td class="text-left">{{ asset.assetNum }}</td>
+                            <td width="10%"><strong>类型</strong></td>
+                            <td class="text-left">{{ asset.assetType }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>品牌</strong></td>
+                            <td>{{ asset.brand }}</td>
+                            <td><strong>型号</strong></td>
+                            <td>{{ asset.model }}</td>
+                        </tr>
+                        <tr class="info">
+                            <td><strong>仓库</strong></td>
+                            <td>{{ asset.get_warehouse_display }}</td>
+                            <td><strong>状态</strong></td>
+                            <td>{{ asset.get_status_display }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>购买日期</strong></td>
+                            <td>{{ asset.buyDate }}</td>
+                            <td><strong>质保日期</strong></td>
+                            <td>{{ asset.warrantyDate }}</td>
+                        </tr>
+                        <tr class="info">
+                            <td><strong>价格/元</strong></td>
+                            <td>{{ asset.price | default_if_none:"" }}</td>
+                            <td><strong>责任人</strong></td>
+                            <td>{{ asset.owner.name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>入库人</strong></td>
+                            <td>{{ asset.operator }}</td>
+                            <td><strong>入库时间</strong></td>
+                            <td>{{ asset.add_time }}</td>
+                        </tr>
+                        <tr class="info">
+                            <td><strong>客户信息</strong></td>
+                            <td colspan="3" >{{ asset.customer | default_if_none:"" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>备注</strong></td>
+                            <td colspan="3" >{{ asset.desc }}</td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+               <br>
+               <div class="box-footer">
+                  <ul class="mailbox-attachments clearfix">
+                    {% for file in asset_file %}
+                    <li>
+                      <a href="/media/{{ file.file_content }}" target="_blank">
+                        <span class="mailbox-attachment-icon has-img"><img src="/media/{{file.file_content }}" alt=""></span>
+                      </a>
+
+                      <div class="mailbox-attachment-info">
+                        <a href="/media/{{ file.file_content }}" target="_blank"><i class="fa fa-camera"></i> <small>{{ file.file_content|cut:'asset_file' }}</small></a>
+                            <span class="mailbox-attachment-size">
+                              <b>上传人</b>：{{ file.upload_user }}
+                              <a href="/media/{{ file.file_content }}" download="{{ file.file_content }}" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a>
+                            </span>
+                      </div>
+                    </li>
+                   {% endfor %}
+                  </ul>
+                </div>
+            <!-- /.box-footer -->
+            </div>
+            <!-- /.box-body -->
+          </div>
+      </div>
+        <!-- /.col -->
+     <!-- TO DO List -->
+      <div class="box">
+        <div class="box-header">
+          <i class="ion ion-clipboard"></i>
+          <h3 class="box-title">资产变更记录</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <ul class="todo-list">
+             {% for log in asset_log %}
+            <li>
+              <!-- drag handle -->
+                  <span class="handle">
+                   <small class="text-maroon">
+                    <i class="glyphicon glyphicon-time"></i>
+                    {{ log.add_time }}
+                   </small>
+                  </span>
+              <!-- todo text -->
+              <i class="fa fa-ellipsis-v"></i>
+              <i class="fa fa-ellipsis-v"></i>
+              <span>操作人：{{ log.operator }}</span>
+              <i class="fa fa-ellipsis-v"></i>
+              <i class="fa fa-ellipsis-v"></i>
+              <span>{{ log.desc | safe }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <!-- /.box-body -->
+      </div>
+          <!-- /.box -->
+
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+  <script type="text/javascript">
+  	$(function() {
+	    $('#ADM-ASSET').addClass('active');
+
+	});
+  	//返回
+    $("#btnReturn").click(function(){
+		history.back();
+	});
+
+    function doUpdate(id){
+	var div=layer.open({
+		type : 2,
+		title : '修改设备信息',
+		shadeClose : false,
+    	maxmin : true,
+		area : [ '800px', '580px' ],
+		content : "{% url 'adm-asset:update' %}"+'?id='+id,
+		end : function() {
+			//oDataTable.ajax.reload();
+            window.location.reload();
+
+		}
+	});
+	layer.full(div)
+}
+
+//上传资料
+  function doAssetUpload(id){
+    var div=layer.open({
+		type : 2,
+		title : '上传资产文件',
+		shadeClose : false,
+        maxmin : true,
+		area : [ '770px', '400px' ],
+		content : [ "{% url 'adm-asset:upload' %}"+'?id='+id],
+		end : function() {
+            window.location.reload();
+
+		}
+	});
+    layer.full(div)
+}
+</script>
+
+{% endblock %}

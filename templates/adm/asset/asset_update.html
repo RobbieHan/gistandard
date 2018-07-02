@@ -1,0 +1,181 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+
+		{% csrf_token %}
+		<div class="box-body">
+          <fieldset>
+            <legend>
+            </legend>
+            <div class="form-group has-feedback">
+                <input class="form-control" name="operator" type="hidden" value="{{ asset.operator }}"/>
+                <input class="form-control" name="id" type="hidden" value="{{ asset.id }}"/>
+                <label class="col-sm-2 control-label">资产编号</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="assetNum" type="text" value="{{ asset.assetNum }}"/>
+                </div>
+                <label class="col-sm-2 control-label">类型</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="assetType">
+                  <option value="{{asset.assetType_id}}">{{ asset.assetType.name }}</option>
+                  {% for type in asset_type %}
+                  <option value="{{ type.id }}">{{ type.name }}</option>
+                  {% endfor %}
+                 </select>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">资产型号</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="model" type="text" value="{{ asset.model }}"/>
+                </div>
+                <label class="col-sm-2 control-label">品牌</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="brand" type="text" value="{{ asset.brand }}"/>
+                </div>
+
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">购买日期</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="buyDate" value="{{ asset.buyDate|date:'Y-m-d' }}"/>
+                </div>
+                <label class="col-sm-2 control-label">质保日期</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="warrantyDate" value="{{ asset.warrantyDate |date:'Y-m-d' }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">资产状态</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="status">
+                  <option value="{{ asset.status }}">{{ asset.get_status_display }}</option>
+                  {% for status in status_list %}
+                  <option value="{{ status.item }}">{{ status.value }}</option>
+                  {% endfor %}
+                 </select>
+                </div>
+                <label class="col-sm-2 control-label">所属仓库</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="warehouse">
+                  <option value="{{ asset.warehouse }}">{{ asset.get_warehouse_display }}</option>
+                  <option value="0">南京</option>
+                  <option value="1">苏州</option>
+                 </select>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="price" type="text" value="{{ asset.price | default_if_none:"" }}"/>
+                </div>
+                <label class="col-sm-2 control-label">使用人</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="owner">
+                  <option value="{{ asset.owner_id }}">{{ asset.owner.name }}</option>
+                  <option value="">无</option>
+                  {% for user in user_info %}
+                  <option value="{{ user.id }}">{{ user.name }}</option>
+                  {% endfor %}
+                 </select>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">客户信息</label>
+                <div class="col-sm-8">
+                    <input class="form-control" name="customer" type="text" placeholder="客户单位: 联系人: 联系电话" value="{{ asset.customer|default_if_none:"" }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">备注信息</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="desc" rows="5" >{{ asset.desc }}</textarea>
+                </div>
+            </div>
+
+          </fieldset>
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'adm-asset:update' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.asset_form_errors, {icon: 5});
+				}
+				return ;
+			}
+		});
+	});
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+/*通过按钮关闭弹layer弹出的页面窗口*/
+{#    $(document).ready(function(){#}
+{#        $("#btnCancel").click(function(){#}
+{#            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引#}
+{#            parent.layer.close(index);//关闭窗口#}
+{#        });#}
+{#    });#}
+
+/*input 时间输入选择*/
+    $(".form_datetime").datetimepicker({
+            language:  'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            //weekStart: 1,
+            //todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+    });
+
+// select2
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+</script>
+
+{% endblock %}

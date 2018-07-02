@@ -1,0 +1,110 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ menu.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>菜单信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="title" type="text" value="{{ menu.title }}"/>
+                </div>
+                <label class="col-sm-2 control-label">代码</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="code" type="text" value="{{ menu.code }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-3">
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="is_top"  value="True" {% ifequal menu.is_top True %}checked{% endifequal %}>启用
+                    </label>
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="is_top"  value="False" {% ifequal menu.is_top False %}checked{% endifequal %}>禁用
+                    </label>
+                </div>
+                <label class="col-sm-2 control-label">父菜单</label>
+                  <div class="col-sm-3">
+                    <select class="form-control select2" name="parent">
+                    <option value="{{ menu.parent.id }}">{{ menu.parent.title }}</option>
+                    {% for parent_menu in menu_list %}
+                    <option value={{ parent_menu.id }} > {{ parent_menu.title }} </option>
+                    {% endfor %}
+                  </select>
+                </div>
+            </div>
+           <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">url</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="url" type="text" value="{{ menu.url }}"/>
+                </div>
+                <label class="col-sm-2 control-label">图标</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="icon" type="text" value="{{ menu.icon | default:'' }}"/>
+                </div>
+            </div>
+          </fieldset>
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'system-rbac:menu-detail' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.result){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else{
+					layer.alert('数据保存失败', {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    });
+
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+
+</script>
+
+{% endblock %}

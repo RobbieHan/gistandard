@@ -1,0 +1,13 @@
+django==1.11.6
+django-crispy-forms
+django-import-export
+django-reversion
+django-formtools
+future
+uwsgi
+httplib2
+six
+xlwt
+xlsxwriter
+mysqlclient
+pillow

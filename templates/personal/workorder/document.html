@@ -1,0 +1,111 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+    <li class="active"><a href="{% url 'personal-document' %}">工单文档</a></li>
+  </ol>
+</section>
+<!-- Main content -->
+<section class="content">
+     <div id="devlist">
+        <div class="box box-primary" id="liebiao">
+             <div class="box-body">
+                <table id="dtbList" class="display" cellspacing="0" width="100%">
+                    <thead>
+                    <tr valign="middle">
+                        <th>工单号</th>
+                        <th>客户单位</th>
+                        <th>上传人</th>
+                        <th>上传时间</th>
+                        <th>文件内容</th>
+                        <th>下载</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <br> <br>
+            </div>
+        </div>
+     </div>
+  </section>
+
+<!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+  <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+  <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+  <!-- iCheck 1.0.1 -->
+  <script type="text/javascript">
+	$(function() {
+	    $('#PERSONAL-DOCUMENT').addClass('active');
+
+	});
+  </script>
+
+<script type="text/javascript">
+  var oDataTable=null;
+  $(function() {
+	oDataTable = initTable();
+	function initTable() {
+		var oTable=$('#dtbList').DataTable($.extend(true,{},
+						DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+						{
+							ajax : {
+								"url":"{% url 'personal-document-list' %}",
+								"data":function ( d ) {
+								}
+						},
+						columns : [
+								{
+									data : "work_order__number",
+								},
+								{
+									data : "work_order__customer__unit",
+								},
+
+                                {
+									data : "name__name",
+								},
+                                {
+									data : "add_time",
+                                    render : function(data, type, full, meta) {
+                                         return  moment(data).format("YYYY-MM-DD");}
+								},
+                                {
+									data : "file_content",
+								},
+								{
+									data : "file_content",
+									bSortable : "false",
+									render : function(data, type, row, meta) {
+										var ret="<a href='/media/"+ data +"' download='"+ data +"'><button title='下载文档'><i class='fa fa-cloud-download\'></i></button></a>";
+										return ret;
+									}
+								} ],
+						}));
+		return oTable;
+	}
+
+});
+
+</script>
+{% endblock %}

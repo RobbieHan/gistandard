@@ -1,0 +1,245 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block title %}SandBox{% endblock %}
+
+{% block content %}
+
+    <section class="content-header">
+      <h1>
+        我的工作台
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 办公平台</a></li>
+        <li><a href="{% url 'personal' %}">我的工作台</a></li>
+      </ol>
+    </section>
+
+    <section class="content">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{ work_order_1 }}</h3>
+
+              <p>已保存的工单</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-pencil"></i>
+            </div>
+            <a href="#" class="small-box-footer">{{ start_date| date:'Y年m月' }}</a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow ">
+            <div class="inner">
+              <h3>{{ work_order_2 }}</h3>
+
+              <p>等待派发的工单</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-send-o"></i>
+            </div>
+            <a href="#" class="small-box-footer">{{ start_date| date:'Y年m月' }}</a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-green">
+            <div class="inner">
+              <h3>{{ work_order_3 }}</h3>
+
+              <p>等待执行的工单</p>
+            </div>
+            <div class="icon">
+              <i class="glyphicon glyphicon-play"></i>
+            </div>
+            <a href="#" class="small-box-footer">{{ start_date| date:'Y年m月' }}</a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-gray">
+            <div class="inner">
+              <h3>{{ work_order_4 }}</h3>
+
+              <p>等待确认的工单</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-check"></i>
+            </div>
+            <a href="#" class="small-box-footer">{{ start_date| date:'Y年m月' }}</a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- /.row -->
+      <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+               <div class="box-header with-border">
+                  <h3 class="box-title">工单数据统计</h3>
+                  <div class="box-tools pull-right">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" title="选择统计类型">
+                        <i class="fa fa-list-alt"></i></button>
+                      <ul class="dropdown-menu bg-aqua" role="menu">
+                        <li><a href="{% url 'personal' %}?value=0">工单提交统计</a></li>
+                        <li><a href="{% url 'personal' %}?value=1">工单执行统计</a></li>
+                      </ul>
+                    </div>
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+               </div>
+            <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                           <div id="bar_container" style="height: 400px"></div>
+                        </div>
+                        <div class="col-md-4">
+                           <div id="pie_container" style="height: 400px"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}
+
+{% block javascripts %}
+  <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
+  <script type="text/javascript">
+	$(function() {
+		$('#index').addClass('active');
+	});
+
+
+	//echarts
+    var bar_dom = document.getElementById("bar_container");
+    var myBarChart = echarts.init(bar_dom);
+    option = null;
+    option = {
+        title : {
+            text: '月度工单统计',
+            subtext: ''
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        legend: {
+            data:[{% for data in month_work_order_count %}'{{ data.name }}',{% endfor %}]
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                dataView : {show: true, readOnly: false},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {% for data in month_work_order_count %}
+            {
+                name:'{{ data.name }}',
+                type:'bar',
+                data:{{ data.count }},
+                markPoint : {
+                    data : [
+                       {type : 'max', name: '最大值'},
+                       {type : 'min', name: '最小值'}
+                    ]
+            },
+        },
+        {% endfor %}
+        ]
+    };
+    ;
+
+    if (option && typeof option === "object") {
+        myBarChart.setOption(option, true);
+    }
+
+
+
+    //echarts bar
+    var pie_dom = document.getElementById("pie_container");
+    var myPieChart = echarts.init(pie_dom);
+    option = null;
+    option = {
+        title : {
+            text: '年度工单比例',
+            subtext: '',
+            x:'center'
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+
+        toolbox: {
+            show : true,
+            feature : {
+                saveAsImage : {show: true}
+            }
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: [{% for data in year_work_order_count %}'{{ data.name }}',{% endfor %}]
+        },
+        series : [
+            {
+                name: '工单申请比例',
+                type: 'pie',
+                radius : '55%',
+                center: ['50%', '60%'],
+                data:[
+                    {% for data in year_work_order_count %}
+                    {value:{{ data.count }}, name:'{{ data.name }}'},
+                    {% endfor %}
+                ],
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    ;
+    if (option && typeof option === "object") {
+        myPieChart.setOption(option, true);
+    }
+
+    //图表窗体自适应
+  $(window).resize(function(){
+      myBarChart.resize();
+      myPieChart.resize();
+  });
+  </script>
+{% endblock %}

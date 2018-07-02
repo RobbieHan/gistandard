@@ -1,0 +1,96 @@
+* {	font-family: "Microsoft Yahei",Helvetica,Arial,sans-serif;}
+.margin-top-5{margin-top: 5px}
+.margin-l-5{margin-left: 5px}
+/*验证码样式captcha css*/
+.form-group1{
+    position:relative;
+    width:100%;
+    height:38px;
+    border:1px solid #dedede;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    overflow:hidden;
+    margin-bottom: 10px;
+}
+
+.form-group1 > label{
+    float:left;
+    width:72px;
+    height:20px;
+    line-height:20px;
+    margin-top:9px;
+    border-right:1px solid #eaeaea;
+    text-align:center;
+}
+.form-group1 > input{
+    float:left;
+    width:100%;
+    line-height:24px;
+    padding:7px 10px;
+    border:0;
+    line-height:normal\9;
+    padding:12px 10px 9px\9;
+}
+.captcha1 > input{
+     width:45%;
+}
+.captcha1 > img {
+    float: right;
+    margin-top: 5px;
+}
+
+.form-group1 .mobile-register-captcha{
+    width:85px;
+}
+.form-group1 .captcha{
+    cursor: pointer;
+}
+.margin-b-10{
+    margin-bottom: 10px;}
+
+/*.table>tbody>tr>td{*/
+        /*text-align: center;*/
+/*}*/
+
+
+/*上传头像*/
+
+/*a  upload */
+.a-upload {
+    padding: 4px 10px;
+    height: 20px;
+    line-height: 20px;
+    position: relative;
+    cursor: pointer;
+    color: #888;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1
+}
+
+.a-upload  input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    cursor: pointer
+}
+
+.a-upload:hover {
+    color: #444;
+    background: #eee;
+    border-color: #ccc;
+    text-decoration: none
+}
+
+/* 列表页查询form样式 */
+.searchArea{width:300px}
+.searchArea label{width:80px}
+.searchArea .inputText{width:200px; border-radius:4px}

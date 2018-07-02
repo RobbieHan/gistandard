@@ -1,0 +1,48 @@
+{% extends "system/users/user-base.html" %}
+
+{% block user-content %}
+<!-- /.login-logo -->
+<div class="login-box-body form-">
+    <p class="login-box-msg"></p>
+    <p></p>
+    <form action="" method="post">
+      <div class="form-group has-feedback {% if login_form.errors.username %}has-error{% endif %}">
+        <input name="username" class="form-control" placeholder="用户名或手机号" value="{{ login_form.username.value }}">  <!--type="email"前端控制email输入验证-->
+        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+      </div>
+      <div class="form-group has-feedback {% if login_form.errors.password %}has-error{% endif %}">
+        <input name="password" type="password" class="form-control" placeholder="密码"
+               value="{{ login_form.password.value }}">
+        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+      </div>
+      <div class="row">
+        <div class="col-xs-8">
+        </div>
+        <!-- /.col -->
+        <div class="col-xs-4">
+          <button type="submit" class="btn btn-primary btn-block btn-flat">登录</button>
+        </div>
+        <!-- /.col -->
+      </div>
+        {% csrf_token %}
+    </form>
+    {% if msg %} <!--判断如果后端返回用户验证错误信息,前端页面输出错误信息-->
+
+        <p class="text-red">{{ msg }}</p>
+
+    {% endif %}
+{#    <div class="social-auth-links text-center">#}
+{#      <a href="{% url 'register' %}" class="btn btn-block btn-social btn-facebook btn-flat">#}
+{#          <i class="glyphicon glyphicon-user"></i> <div class="text-center">员工帐号注册通道</div>#}
+{#      </a>#}
+{#      <a href="{% url 'forgetpwd' %}" class="btn btn-block btn-social btn-google btn-flat">#}
+{#          <i class="glyphicon glyphicon-search"></i> <div class="text-center">帐号密码找回通道</div>#}
+{#      </a>#}
+{#    </div>#}
+    <!-- /.social-auth-links -->
+
+  </div>
+  <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+{% endblock %}

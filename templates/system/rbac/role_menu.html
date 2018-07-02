@@ -1,0 +1,162 @@
+{% extends "base-layer.html" %} {% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/zTree/css/metroStyle/metroStyle.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'plugins/zTree/css/zTreeStyle/zTreeStyle.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'plugins/zTree/css/demo.css' %}" type="text/css">
+{% endblock %}
+{% block main %}
+
+<style type="text/css">
+.ztree li span.button.switch.level0 {visibility:hidden; width:1px;}
+.ztree li ul.level0 {padding:0; background:none;}
+
+
+</style>
+<div class="box box-danger">
+    <form class="form-horizontal" id="addTreeForm" action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name='id' value="{{role.id}}"/>
+        <input type="hidden" name="tree" id="tree" value=""/>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-5">
+                    <div class="row span7 text-center ">
+                        <label class="control-label"><h5>所有菜单</h5></label>
+                    </div>
+                    <div style="zTreeDemoBackground left">
+                        <ul id="left_tree" class="ztree"></ul>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <br><br><br><br><br><br>
+                    <div class="row span7 text-center ">
+                        <button type="button" id="btnSave" class="btn btn-info margin-right ">生成</button>
+                    </div>
+                </div>
+                <div class="col-xs-5">
+                    <div class="row span7 text-center ">
+                        <label class="control-label"><h5>已选菜单</h5></label>
+                    </div>
+                    <ul id="right_tree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript" src="{% static 'plugins/zTree/js/jquery.ztree.core.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugins/zTree/js/jquery.ztree.excheck.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var zTree;
+	var demoIframe;
+
+	var left_tree_setting = {
+		view: {
+			dblClickExpand: false,
+			showLine: true,
+			selectedMulti: true
+		},
+		check: {
+			enable: true,
+			//chkboxType : { "Y" : "", "N" : "" }
+		},
+		data: {
+			key:{
+				name:"title",
+				title:"title",
+			},
+			simpleData: {
+				enable:true,
+				idKey: "id",
+				pIdKey: "parent",
+				rootPId: ""
+			},
+		}
+	};
+
+	var right_tree_setting = {
+		view: {
+			dblClickExpand: false,
+			showLine: true,
+			selectedMulti: true
+		},
+		check: {
+			enable: false,
+			//chkboxType : { "Y" : "", "N" : "" }
+		},
+		data: {
+			key:{
+				name:"title",
+				title:"title",
+			},
+			simpleData: {
+				enable:true,
+				idKey: "id",
+				pIdKey: "parent",
+				rootPId: ""
+			},
+		}
+	};
+
+    $.ajax({
+			type: "GET",
+			url : "{% url 'system-rbac:role-role_menu_list' %}",
+			cache: false,
+			success : function(msg) {
+				layer.close();
+				var t = $("#left_tree");
+				t = $.fn.zTree.init(t, left_tree_setting, msg.data);
+                var treeObj = $.fn.zTree.getZTreeObj("left_tree");
+                treeObj.expandAll(true);
+				return ;
+			}
+	});
+
+	$.ajax({
+			type: "GET",
+			url : "{% url 'system-rbac:role-role_menu_list' %}",
+			data : {"id":{{role.id}}},
+			cache: false,
+			success : function(msg) {
+				layer.close();
+				var t = $("#right_tree");
+				t = $.fn.zTree.init(t, right_tree_setting, msg.data);
+				var treeObj = $.fn.zTree.getZTreeObj("right_tree");
+                treeObj.expandAll(true);
+				return ;
+			}
+	});
+
+	$("#btnSave").click(function(){
+		var treeObj=$.fn.zTree.getZTreeObj("left_tree");
+        var nodes=treeObj.getCheckedNodes(true);
+        $("#tree").val(JSON.stringify(nodes));
+		var data = $("#addTreeForm").serialize();
+		$.ajax({
+			type: $("#addTreeForm").attr('method'),
+			url : "{% url 'system-rbac:role-role_menu' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.result){
+					layer.alert('操作成功',{icon:1},function(index){
+					    parent.layer.closeAll();
+					});
+				}else{
+					//alert(msg.message);
+					layer.alert('操作失败', {icon:2});
+				}
+				return ;
+			}
+		});
+	});
+});
+
+
+
+</script>
+{% endblock %}

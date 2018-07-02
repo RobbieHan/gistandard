@@ -1,0 +1,73 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+        <div class="box-body">
+          <fieldset>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">文件上传</label>
+                <div class="col-sm-8">
+                    <div class="file-loading">
+                        <input id="file_content" name="file_content"  type="file" multiple="multiple"/>
+                    </div>
+                </div>
+            </div>
+          </fieldset>
+            <fieldset>
+                <div class="form-group has-feedback">
+                    <label class="col-sm-2 control-label"></label>
+                    <div class="col-sm-8">
+                        <small class="text-red">只支持上传图片文件，最多上传4张，大小不得超过10M</small>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+<script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+<script type="text/javascript">
+
+
+// 获取表单数据
+
+
+//上传文件
+
+$(document).on('ready', function() {
+    $("#file_content").fileinput({
+        language: "zh",
+        showUpload: true,
+        allowedFileExtensions: ["png", "jpg", "gif"],
+        uploadUrl: "{% url 'adm-asset:upload' %}",
+        uploadExtraData: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'asset': '{{ asset.id }}',
+            'upload_user': '{{ request.user.name }}',
+        },
+        maxFileCount: 4,
+        autoReplace: true,
+        maxFileSize: 10240,
+    });
+});
+
+
+
+
+</script>
+
+{% endblock %}

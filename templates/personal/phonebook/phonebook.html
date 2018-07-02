@@ -1,0 +1,59 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+    <li class="active"><a href="{% url 'personal-phonebook' %}">内部通信</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+<section class="content">
+  <div class="row">
+  {% for linkman in linkmans %}
+     <div class="col-md-3">
+      <div class="box box-primary">
+        <div class="box-body box-profile">
+          <img class="profile-user-img img-responsive img-circle" src="/media/{{linkman.image }}" alt="User profile picture">
+
+          <h3 class="profile-username text-center">{{ linkman.name }}-{{ linkman.post }}</h3>
+
+          <p class="text-muted text-center">{{ linkman.department__title }}</p>
+
+          <ul class="list-group list-group-unbordered">
+            <li class="list-group-item">
+              <b>手机：</b> <a>{{ linkman.mobile }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>邮箱：</b> <a>{{ linkman.email }}</a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.box-body -->
+      </div>
+     </div>
+  {% endfor %}
+ </div>
+
+<!-- Modal -->
+</section>
+
+{% endblock %}
+{% block javascripts %}
+<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+<script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+<script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+<script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+<script type="text/javascript">
+	$(function() {
+		$('#PERSONAL-PHONEBOOK').addClass('active');
+
+	});
+  </script>
+
+{% endblock %}

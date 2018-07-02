@@ -1,0 +1,78 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<div class="box-body">
+          <fieldset>
+              <legend>
+              <h4>修改密码</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">新密码</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="password" type="password" value=""/>
+                </div>
+                <label class="col-sm-2 control-label">确认密码</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="confirm_password" type="password" value=""/>
+                </div>
+            </div>
+
+          </fieldset>
+
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >确定</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'system-basic:user-passwdchange' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('密码修改成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.admin_passwd_change_form_errors, {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header margin-bottom">
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+    <li class="active"><a href="{% url 'adm-equipment:equipment' %}">设备管理</a></li>
+    <li class="active"><a href="{% url 'adm-equipment:equipment-detail' %}">设备详情</a></li>
+  </ol>
+</section>
+    <!-- Main content -->
+
+  <section class="content">
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">客户信息</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+              <ul class="nav nav-pills nav-stacked">
+                  <li><a href="#" title="联系人"><i class="fa fa-user"></i>  {{ equipment.customer.name }}</a></li>
+                <li><a href="#" title="电话"><i class="fa fa-phone"></i> {{ equipment.customer.phone }}</a></li>
+                <li><a href="#" title="单位"><i class="fa fa-building" ></i> {{ equipment.customer.unit }}</a></li>
+                <li><a href="#" title="地址"><i class="fa fa-map-marker"></i> {{ equipment.customer.address }}</a></li>
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /. box -->
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">销售信息</h3>
+
+              <div class="box-tools">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body no-padding">
+              <ul class="nav nav-pills nav-stacked">
+                  <li><a href="#" title="联系人"><i class="fa fa-user"></i>{{ equipment.customer.belongs_to.name }}</a></li>
+                <li><a href="#" title="电话"><i class="fa fa-phone"></i>{{ equipment.customer.belongs_to.mobile }}</a></li>
+                <li><a href="#" title="邮箱"><i class="fa fa-envelope" ></i>{{ equipment.customer.belongs_to.email }}</a></li>
+              </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#activity" data-toggle="tab">设备信息</a></li>
+              <li><a href="#timeline" data-toggle="tab">维保记录</a></li>
+              <li class="pull-right"><a href="" data-toggle="tab">
+                  <button type="button" id="btnReturn" class="btn btn-default">
+                  <i class="fa fa-reply"></i>返回
+                  </button>
+              </a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="active tab-pane" id="activity">
+                <div class="box-header">
+                    <h3 class="box-title text-bold">设备信息：</h3>
+                </div>
+                <div class="box-body no-padding">
+                  <table class="table table-striped"><tbody>
+                    <tr>
+                        <td style="width: 30%"><strong>设备编号</strong></td>
+                      <td>{{ equipment.number }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>设备类型</strong></td>
+                      <td>{{ equipment.equipment_type }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>设备型号</strong></td>
+                      <td>{{ equipment.equipment_model }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>购买日期</strong></td>
+                      <td>{{ equipment.buy_date }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>质保日期</strong></td>
+                      <td>{{ equipment.warranty_date }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>费用核算</strong></td>
+                      <td>{% if equipment.accounting is True %}已核算{% else %}未核算{% endif %}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>配置说明</strong></td>
+                      <td>{{ equipment.config_desc }}</td>
+                    </tr>
+                  </tbody></table>
+                </div>
+                <div class="box-header">
+                    <h3 class="box-title text-bold">分销商信息:</h3>
+                </div>
+                <div class="box-body no-padding">
+                  <table class="table table-striped"><tbody>
+                    <tr>
+                      <td style="width: 30%"><strong>分销商</strong></td>
+                      <td>{{ equipment.supplier.company }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>联系人</strong></td>
+                      <td>{{ equipment.supplier.linkname }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>联系电话</strong></td>
+                      <td>{{ equipment.supplier.phone }}</td>
+                    </tr>
+                  </tbody></table>
+                </div>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="timeline">
+                <!-- The timeline -->
+                  <div class="box-header">
+                    <div class="btn-group pull-left">
+                           <p>设备维保服务进度更新记录</p>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <button type="button" id="btnUpdate" class="btn btn-info" onclick="doUpdate({{ equipment.id }})">
+                            <i class="glyphicon glyphicon-refresh"></i>更新
+                        </button>
+                        <div class="btn-group pull-left">&nbsp;</div>
+                    </div>
+                  </div>
+                <ul class="timeline timeline-inverse">
+                  <!-- timeline time label -->
+                  {% for service_info in services %}
+                  <li class="time-label">
+                        <span class="bg-red">
+                         {{ service_info.date|date:'Y年m月d日'}}
+                        </span>
+                  </li>
+                    {% for info in service_info.content %}
+                  <li>
+                    <i class="fa fa-file-text bg-blue"></i>
+
+                    <div class="timeline-item">
+                      <span class="time"><i class="fa fa-clock-o"></i> {{ info.add_time|date:'H:m' }}</span>
+
+                      <h3 class="timeline-header"><a href="#">{{ info.writer.name }}</a> <small>维保记录</small></h3>
+
+                      <div class="timeline-body">
+                        {{ info.content }}
+                      </div>
+{#                      <div class="timeline-footer">#}
+{#                        <a class="btn btn-primary btn-xs">Read more</a>#}
+{#                        <a class="btn btn-danger btn-xs">Delete</a>#}
+{#                      </div>#}
+                    </div>
+                  </li>
+                   {% endfor %}
+                  {% endfor %}
+                  <!-- END timeline item -->
+                  <li>
+                    <i class="fa fa-clock-o bg-gray"></i>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+  <script type="text/javascript">
+	$(function() {
+	    $('#ADM-EQUIPMENT').addClass('active');
+
+	});
+
+    $("#btnReturn").click(function(){
+		history.back();
+	});
+
+	function doUpdate(id) {
+		    layer.open({
+			type : 2,
+			title : '更新维保记录',
+			shadeClose : false,
+			maxmin : true,
+			area : [ '800px', '300px' ],
+			content : "{% url 'adm-equipment:service-info-update' %}"+'?id='+id,
+            end : function() {
+            window.location.reload();
+
+		}
+
+		});
+	}
+
+  </script>
+
+{% endblock %}

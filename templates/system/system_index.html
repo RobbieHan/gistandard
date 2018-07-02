@@ -1,0 +1,83 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block title %}SandBox{% endblock %}
+
+{% block content %}
+
+
+    <section class="content-header">
+      <h1>
+        系统
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 办公平台</a></li>
+        <li><a href="{% url 'system' %}">系统</a></li>
+      </ol>
+    </section>
+
+    <div class="pad margin no-print">
+      <div class="callout callout-info" style="margin-bottom: 0!important;">
+        <h4><i class="fa  fa-info-circle"></i> 提示信息:</h4>
+        系统模块用于修改系统基本配置，包括：组织架构、用户管理、权限管理[菜单管理、角色管理]、系统参数设置等.
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="invoice">
+      <!-- title row -->
+      <div class="row">
+        <div class="col-xs-12">
+          <h2 class="page-header">
+            <i class="fa fa-globe"></i> SandBox, Inc.
+          </h2>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- info row -->
+      <div class="row invoice-info">
+        <div class="col-sm-4 invoice-col">
+          <b>公司定位</b>
+          <p>
+            <strong></strong><br>
+            致力于成为专业的信息安全服务商<br>
+            为用户提供专业、全面的安全服务<br>
+            点滴专注、值得信赖<br>
+            <strong></strong><br>
+          </p>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-4 invoice-col">
+          <b>公司文化</b>
+          <p>
+            <strong></strong><br>
+            以质量求生存，以服务促发展<br>
+            追求客户满意，是你我的责任<br>
+            强化竞争意识，营造团队精神<br>
+            <strong></strong><br>
+
+          </p>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-4 invoice-col">
+          <b>通信方式</b><br>
+          <br>
+          <b>电话:</b> <br>
+          <b>邮箱:</b> <br>
+          <b>地址:</b>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+  <script type="text/javascript">
+	$(function() {
+		$('#index').addClass('active');
+	});
+  </script>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base-static.html" %}
+{% load staticfiles %}
+
+{% block main %}
+    <!-- Main Header -->
+    <header class="main-header">
+
+        <!-- Logo -->
+        <a href="#" class="logo">
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+            <span class="logo-mini"><b>Sand</b></span>
+            <!-- logo for regular state and mobile devices -->
+            <span class="logo-lg"><b>{% if system_setup.mainTitle %}{{ system_setup.mainTitle }}{% else %}SandBox{% endif %}</b></span>
+        </a>
+
+        <!-- Header Navbar -->
+        <nav class="navbar navbar-static-top" role="navigation">
+            <!-- Sidebar toggle button-->
+            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                <span class="sr-only">Toggle navigation</span>
+            </a>
+            <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                {% for menu in request.top_menu %}
+                    <ul class="nav navbar-nav">
+                        <li {% ifequal menu.status True %}class="active" {% endifequal %}><a
+                                href="{{ menu.url }}"
+                                id="index">{{ menu.title | default_if_none:"" }}</a></li>
+                    </ul>
+                {% endfor %}
+            </div>
+            {% if request.user.is_authenticated %}
+                <div class="navbar-custom-menu">
+                    <!-- Navbar Right Menu -->
+                    <ul class="nav navbar-nav">
+
+                        <!-- Notifications Menu -->
+                        <li class="dropdown notifications-menu">
+                            <!-- Menu toggle button -->
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-bell-o"></i>
+                                <span class="label label-danger"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">信息：</li>
+                                <li>
+                                    <!-- Inner Menu: contains the notifications -->
+                                    <ul class="menu">
+                                        <li><!-- start notification -->
+                                            <a href="#">
+                                                <i class="fa fa-users text-aqua"></i> 消息中心功能暂未开放，敬请期待。 --RobbieHan
+                                            </a>
+                                        </li>
+                                        <!-- end notification -->
+                                    </ul>
+                                </li>
+                                <li class="footer"><a href="#">查看全部消息</a></li>
+                            </ul>
+                        </li>
+                        <!-- User Account Menu -->
+                        {% if request.user.is_authenticated %}
+                            <li class="dropdown user user-menu">
+                            <!-- Menu Toggle Button -->
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <!-- The user image in the navbar-->
+                                <img src="/media/{{ request.user.image }}" class="user-image" alt="用户头像">
+                                <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                                <span class="hidden-xs">{{ request.user.name }}</span>
+                                <!--上面 request.user 会返回用户姓名，user.models.UserProfile.Meta定义该值-->
+
+                            </a>
+                            <ul class="dropdown-menu">
+                            <!-- The user image in the menu -->
+                            <li class="user-header">
+                                <img src="/media/{{ request.user.image }}" class="img-circle" alt="User Image">
+
+                                <p>
+                                    <!--gender字段定义的choices类型，想要获取字段的value,使用get_gender_display-->
+                                    {{ request.user.name }} - {{ request.user.department.title }}
+                                    <small>{{ request.user.email }}</small>
+                                </p>
+                            </li>
+                        {% endif %}
+
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a href="{% url 'personal-user_info' %}" class="btn btn-default btn-flat">个人中心</a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="/logout/" class="btn btn-default btn-flat">注销用户</a>
+                            </div>
+                        </li>
+                        </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                        <li>
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </nav>
+    </header>
+    <!-- Left side column. contains the logo and sidebar -->
+    {% block middle %}
+
+    {% endblock %}
+
+    <!-- Main Footer -->
+    <footer class="main-footer text-center">
+        <strong>
+          {% if system_setup.copyright %}
+              {{ system_setup.copyright }}
+          {% else %}
+              Copyright © 2016-2017 江苏沙盒科技.Version1.0.1
+          {% endif %}
+        </strong>
+        技术支持：<a href="">Robbiehan</a>
+    </footer>
+
+{% endblock %}

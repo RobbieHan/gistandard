@@ -1,0 +1,181 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ equipment.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">设备编号</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="number" type="text" value="{{ equipment.number }}"/>
+                </div>
+                <label class="col-sm-2 control-label">类型</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="equipment_type">
+                  <option value={{ equipment.equipment_type.id }}> {{ equipment.equipment_type.name|default:"" }} </option>
+                  {% for type in equipment_type %}
+                  <option value="{{ type.id }}">{{ type.name }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">设备型号</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="equipment_model" type="text" value="{{ equipment.equipment_model }}"/>
+                </div>
+                <label class="col-sm-2 control-label">购买日期</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="buy_date" value="{{ equipment.buy_date |date:"Y-m-d" }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">质保日期</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="warranty_date" value="{{ equipment.warranty_date |date:"Y-m-d"}}"/>
+                </div>
+                <label class="col-sm-2 control-label">购买单位</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="customer">
+                  <option value={{ equipment.customer_id }}> {{ equipment.customer.unit|default:"" }} </option>
+                  {% for cus in customer %}
+                  <option value="{{ cus.id}}">{{ cus.unit }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">分销商</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="supplier">
+                  <option value=""> </option>
+                  <option value={{ equipment.supplier_id }}> {{ equipment.supplier.company}} </option>
+                  {% for supplier in suppliers %}
+                  <option value="{{ supplier.id}}">{{ supplier.company }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+               {% if role_list %}
+                <label class="col-sm-2 control-label">费用核算</label>
+                <div class="col-sm-3">
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="accounting"  value="True" {% ifequal equipment.accounting True %}checked{% endifequal %}> 已核算
+                    </label>
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="accounting"  value="False" {% ifequal equipment.accounting False %}checked{% endifequal %}{% if not equipment %}checked{% endif %}> 未核算
+                    </label>
+
+                </div>
+               {% endif %}
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">配置说明</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="config_desc" rows="5" >{{ equipment.config_desc }}</textarea>
+                </div>
+            </div>
+
+          </fieldset>
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'adm-equipment:create' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.equipment_form_errors, {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+/*
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "/system/basic/user/create",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('用户添加成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.user_create_form_errors, {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+* */
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+/*input 时间输入选择*/
+    $(".form_datetime").datetimepicker({
+            language:  'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            //weekStart: 1,
+            //todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+    });
+
+// select2
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+</script>
+
+{% endblock %}

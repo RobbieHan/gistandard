@@ -1,0 +1,201 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ user.id }}" />
+		<input type="hidden" name='user' value="save" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>基本信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">姓名</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="name" type="text" value=""/>
+                </div>
+                <label class="col-sm-2 control-label">性别</label>
+                <div class="col-sm-3">
+                  <select class="form-control" name="gender">
+                    <option value="male">男</option>
+                    <option value="famale">女</option>
+                  </select>
+                </div>
+
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">生日</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="birthday"/>
+                </div>
+                <label class="col-sm-2 control-label">用户名</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" name="username"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-6">
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="is_active"  value="True" checked>启用
+                    </label>
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="is_active"  value="False">禁用
+                    </label>
+                </div>
+            </div>
+            <legend>
+              <h4>密码信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">密码</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="password" type="password" value=""/>
+                </div>
+                <label class="col-sm-2 control-label">确认密码</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="confirm_password" type="password" value=""/>
+                </div>
+            </div>
+            <legend>
+              <h4>联系信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">手机</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="mobile" type="text"/>
+                </div>
+                <label class="col-sm-2 control-label">邮箱</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="email" type="text"/>
+                </div>
+            </div>
+            <legend>
+              <h4>职员信息</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">入职日期</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control pull-right form_datetime" name="joined_date"/>
+                </div>
+                <label class="col-sm-2 control-label">部门</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="department">
+                  <option value="">--部门--</option>
+                  {% for structure in structures %}
+                  <option value="{{ structure.id }}">{{ structure.title }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">岗位</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="post" type="text"/>
+                </div>
+                <label class="col-sm-2 control-label">上级</label>
+                <div class="col-sm-3">
+                  <select class="form-control select2" style="width:100%;" name="superior">
+                  <option value="">--上级--</option>
+                  {% for user in users %}
+                  <option value="{{ user.id }}">{{ user.name }}</option>
+                  {% endfor %}
+                 </select>
+                 </div>
+
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">所属角色组</label>
+                <div class="col-sm-6">
+                    {% for role in roles %}
+                    <label class="control-label">
+                      <input type="checkbox" class="minimal" name="roles" value="{{ role.id }}" {% if role in user_roles %}checked{% endif %}>
+                        {{ role.title }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+          </fieldset>
+
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "/system/basic/user/create",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('用户添加成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.user_create_form_errors, {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    })
+
+/*input 时间输入选择*/
+    $(".form_datetime").datetimepicker({
+            language:  'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            //weekStart: 1,
+            //todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+    });
+
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+
+</script>
+
+{% endblock %}

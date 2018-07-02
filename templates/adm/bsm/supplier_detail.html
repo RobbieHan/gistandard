@@ -1,0 +1,115 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ supplier.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>分销商管理</h4>
+            </legend>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">公司名称</label>
+                <div class="col-sm-8">
+                    <input class="form-control" name="company" type="text" value="{{ supplier.company }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">公司地址</label>
+                <div class="col-sm-8">
+                    <input class="form-control" name="address" type="text" value="{{ supplier.address }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">联系人</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="linkname" type="text" value="{{ supplier.linkname }}"/>
+                </div>
+                <label class="col-sm-2 control-label">联系电话</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="phone" type="text" value="{{ supplier.phone }}"/>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-3">
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="status"  value="True" {% ifequal supplier.status True %}checked{% endifequal %}{% if not supplier.status %}checked{% endif %}>启用
+                    </label>
+                    <label class="control-label">
+                      <input type="radio" class="minimal" name="status"  value="False" {% ifequal supplier.status False %}checked{% endifequal %}>禁用
+                    </label>
+                </div>
+                <label class="col-sm-2 control-label">负责人</label>
+                  <div class="col-sm-3">
+                    <select class="form-control" name="belongs_to">
+                    <option value={{ supplier.belongs_to.id| default:request.user.id }}> {{ supplier.belongs_to.name | default:request.user.name }} </option>
+                    {% for user in users %}
+                    <option value={{ user.id }}> {{ user.name}} </option>
+                    {% endfor %}
+                  </select>
+                </div>
+            </div>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">备注</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="desc" rows="5">{{ supplier.desc }}</textarea>
+                </div>
+            </div>
+          </fieldset>
+
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'adm-bsm:supplier-detail' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.status == 'success'){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else if (msg.status == 'fail'){
+					layer.alert(msg.supplier_form_errors, {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
+			}
+		});
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    });
+
+
+</script>
+
+{% endblock %}
