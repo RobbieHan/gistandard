@@ -69,5 +69,5 @@ $ docker cp db_tools/data/basic_data.sql gistandard_mysql_1:/tmp <br>
 $ docker-compose exec mysql bash<br>
 $ mysql -uddadmin -p1234@abcd.com gistandard < /tmp/basic_data.sql <br>
 
-导入玩数据库就可以正常访问系统了 <br>
+导入数据库就可以正常访问系统了 <br>
 http://your_ip   初始用户 admin  密码 !qaz@wsx <br>
