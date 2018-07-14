@@ -45,7 +45,7 @@ sandbox是一个基于django框架开发的轻量级办公平台，主要模块�
 项目地址：https://github.com/RobbieHan/gistandard
 
 # 3 安装说明
-系统运行环境 centos7 ， 系统需要安装 docker , docker-compose<br>
+系统运行环境 centos7 python3.6 ,系统需要安装 docker , docker-compose<br>
 下载项目文件到你的系统<br>
 $ git clone https://github.com/RobbieHan/gistandard.git<br>
 进入项目目录<br>
