@@ -60,8 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.users.middleware.MenuMiddleware',
-    'apps.rbac.middleware.RbacMiddleware',
+    #'apps.users.middleware.MenuMiddleware',
+    #'apps.rbac.middleware.RbacMiddleware',
 ]
 
 ROOT_URLCONF = 'gistandard.urls'
