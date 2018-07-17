@@ -4,7 +4,6 @@ django-import-export
 django-reversion
 django-formtools
 future
-uwsgi
 httplib2
 six
 xlwt
