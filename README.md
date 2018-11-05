@@ -87,9 +87,9 @@ http://your_ip   初始用户 admin  密码 !qaz@wsx <br>
 
 ## 3.2 本地环境运行
 如果只是想查看代码和系统功能，可以在本地windows环境下临时运行项目，或者使用开发工具运行项目<br>
-1、从github上下载项目文件到本地，或者使用git克隆项目
-2、在windows上安装python3.6环境（也可以使用python虚拟化境，python环境的安装网上很多，这里不再记录）
-3、修改gistandard/gistandard/settings.py文件中数据库连接配置DATABASES, 本地运行使用db.sqlite3数据库，内涵测试数据
+1、从github上下载项目文件到本地，或者使用git克隆项目 <br>
+2、在windows上安装python3.6环境（也可以使用python虚拟环境，python环境的安装方法网上很多，这里不再写了）<br>
+3、修改gistandard/gistandard/settings.py文件中数据库连接配置DATABASES, 本地运行使用db.sqlite3数据库，内含测试数据 <br>
 ```
 DATABASES = {
     'default': {
