@@ -99,6 +99,13 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -143,7 +150,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = '/login/'
 
-# 权限控制URL白名单
+# URL white list
 SAFE_URL = [r'^/$',
             '/login/',
             '/logout',
@@ -152,7 +159,7 @@ SAFE_URL = [r'^/$',
             '/xadmin/',
             ]
 
-# session过期时间设置
+# session timeout
 
 SESSION_COOKIE_AGE = 60 * 20
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
